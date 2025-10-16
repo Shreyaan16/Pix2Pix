@@ -5,7 +5,7 @@ DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 TRAIN_DIR = "data/maps/train"
 VAL_DIR = "data/maps/val"
 LEARNING_RATE = 2e-4
-BATCH_SIZE = 16
+BATCH_SIZE = 16 #1096 images 16 batch size hence number of batches = 1096/16 = 69
 NUM_WORKERS = 2
 IMAGE_SIZE = 256
 CHANNELS_IMG = 3

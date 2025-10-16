@@ -28,8 +28,9 @@ def train_fn(
         # Train Discriminator
         with autocast(device_type='cuda'):
             y_fake = gen(x) # generator output
-            D_real = disc(x, y)
+            D_real = disc(x, y) #Discriminator confidence that real is real
             D_real_loss = bce(D_real, torch.ones_like(D_real))
+            #Discriminator confidence that fake is real
             D_fake = disc(x, y_fake.detach()) #.detach() stops gradients from flowing into the generator when updating D.
             D_fake_loss = bce(D_fake, torch.zeros_like(D_fake))
             D_loss = (D_real_loss + D_fake_loss) / 2
@@ -42,9 +43,10 @@ def train_fn(
 
         # Train generator
         with autocast(device_type='cuda'):
-            D_fake = disc(x, y_fake)
-            G_fake_loss = bce(D_fake, torch.ones_like(D_fake))
+            D_fake = disc(x, y_fake) 
+            G_fake_loss = bce(D_fake, torch.ones_like(D_fake)) 
             L1 = l1_loss(y_fake, y) * config.L1_LAMBDA
+            #Total generator loss
             G_loss = G_fake_loss + L1
 
         opt_gen.zero_grad()
@@ -90,6 +92,7 @@ def main():
     val_loader = DataLoader(val_dataset, batch_size=1, shuffle=False)
 
     for epoch in range(config.NUM_EPOCHS):
+        #After 69 batches → 1 epoch complete → Save examples → Start next epoch
         print(f"\nEpoch [{epoch+1}/{config.NUM_EPOCHS}]")
         train_fn(
             disc, gen, train_loader, opt_disc, opt_gen, L1_LOSS, BCE, g_scaler, d_scaler,
