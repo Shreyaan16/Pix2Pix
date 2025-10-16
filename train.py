@@ -56,6 +56,8 @@ def train_fn(
             loop.set_postfix(
                 D_real=torch.sigmoid(D_real).mean().item(),
                 D_fake=torch.sigmoid(D_fake).mean().item(),
+                G_loss=G_loss.item(),
+                L1=L1.item(),
             )
 
 
@@ -88,6 +90,7 @@ def main():
     val_loader = DataLoader(val_dataset, batch_size=1, shuffle=False)
 
     for epoch in range(config.NUM_EPOCHS):
+        print(f"\nEpoch [{epoch+1}/{config.NUM_EPOCHS}]")
         train_fn(
             disc, gen, train_loader, opt_disc, opt_gen, L1_LOSS, BCE, g_scaler, d_scaler,
         )
