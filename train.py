@@ -20,19 +20,21 @@ def train_fn(
 ):
     loop = tqdm(loader, leave=True)
 
+    #iterate over batches x -> input image , y -> target image
     for idx, (x, y) in enumerate(loop):
         x = x.to(config.DEVICE)
         y = y.to(config.DEVICE)
 
         # Train Discriminator
         with autocast(device_type='cuda'):
-            y_fake = gen(x)
+            y_fake = gen(x) # generator output
             D_real = disc(x, y)
             D_real_loss = bce(D_real, torch.ones_like(D_real))
-            D_fake = disc(x, y_fake.detach())
+            D_fake = disc(x, y_fake.detach()) #.detach() stops gradients from flowing into the generator when updating D.
             D_fake_loss = bce(D_fake, torch.zeros_like(D_fake))
             D_loss = (D_real_loss + D_fake_loss) / 2
 
+        #Mixed-precision training is used with GradScaler for stability and speed on GPUs.
         disc.zero_grad()
         d_scaler.scale(D_loss).backward()
         d_scaler.step(opt_disc)

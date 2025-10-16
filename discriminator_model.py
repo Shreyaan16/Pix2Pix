@@ -10,20 +10,20 @@ class CNNBlock(nn.Module):
             nn.Conv2d(
                 in_channels, out_channels, 4, stride, 1, bias=False, padding_mode="reflect"
             ),
-            nn.BatchNorm2d(out_channels),
+            nn.BatchNorm2d(out_channels), #Normalizes across the batch and spatial dimensions for each channel. layernorm has No dependency on other samples in the batch.
             nn.LeakyReLU(0.2),
         )
 
     def forward(self, x):
         return self.conv(x)
 
+#PatchGAN
 class Discriminator(nn.Module):
     def __init__(self, in_channels=3, features=[64, 128, 256, 512]):
         super().__init__()
         self.initial = nn.Sequential(
             nn.Conv2d(
-                in_channels * 2, #input image along with output image , concat along channels 
-                # compare in pair to tell if patch real or fake
+                in_channels * 2, #input image along with output image , concat along channels compare in pair to tell if patch real or fake
                 features[0],
                 kernel_size=4,
                 stride=2,
@@ -45,7 +45,7 @@ class Discriminator(nn.Module):
             nn.Conv2d(
                 in_channels, 1, kernel_size=4, stride=1, padding=1, padding_mode="reflect"
             ),
-        )
+        ) #This reduces channels → 1, meaning one output “real/fake” score per patch.
 
         self.model = nn.Sequential(*layers)
 

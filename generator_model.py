@@ -23,6 +23,7 @@ class Block(nn.Module):
         return self.dropout(x) if self.use_dropout else x
 
 
+#Unet architechture with skip connections 
 class Generator(nn.Module):
     def __init__(self, in_channels=3, features=64):
         super().__init__()
@@ -40,7 +41,7 @@ class Generator(nn.Module):
         self.bottleneck = nn.Sequential(nn.Conv2d(features * 8, features * 8, 4, 2, 1), nn.ReLU()) #1x1 
                                         
         self.up1 = Block(features * 8, features * 8, down=False, act="relu", use_dropout=True) #2
-        self.up2 = Block(features * 8 * 2, features * 8, down=False, act="relu", use_dropout=True) #get concat from encoder part hence *2
+        self.up2 = Block(features * 8 * 2, features * 8, down=False, act="relu", use_dropout=True) #get skip connections , concat from encoder part hence *2
         self.up3 = Block(features * 8 * 2, features * 8, down=False, act="relu", use_dropout=True) #8
         self.up4 = Block(features * 8 * 2, features * 8, down=False, act="relu", use_dropout=False)
         self.up5 = Block(features * 8 * 2, features * 4, down=False, act="relu", use_dropout=False)
