@@ -1,6 +1,5 @@
 import torch
-import albumentations as A
-from albumentations.pytorch import ToTensorV2
+from torchvision import transforms
 
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 TRAIN_DIR = "data/maps/train"
@@ -18,22 +17,21 @@ SAVE_MODEL = False
 CHECKPOINT_DISC = "disc.pth.tar"
 CHECKPOINT_GEN = "gen.pth.tar"
 
-both_transform = A.Compose(
-    [A.Resize(width=256, height=256),], additional_targets={"image0": "image"},
-)
+# Transform for both input and target (resize)
+both_transform = transforms.Compose([
+    transforms.Resize((256, 256)),
+])
 
-transform_only_input = A.Compose(
-    [
-        A.HorizontalFlip(p=0.5),
-        A.ColorJitter(p=0.2),
-        A.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5], max_pixel_value=255.0,),
-        ToTensorV2(),
-    ]
-)
+# Transform for input image (with augmentation)
+# Note: HorizontalFlip is handled in dataset.py for synchronization
+transform_only_input = transforms.Compose([
+    transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.2),
+    transforms.ToTensor(),
+    transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]),
+])
 
-transform_only_mask = A.Compose(
-    [
-        A.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5], max_pixel_value=255.0,),
-        ToTensorV2(),
-    ]
-)
+# Transform for target image (no augmentation)
+transform_only_mask = transforms.Compose([
+    transforms.ToTensor(),
+    transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]),
+])

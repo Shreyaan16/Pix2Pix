@@ -2,6 +2,5 @@ torch
 PIL
 numpy
 os
-albumentations
 torchvision
 tqdm
