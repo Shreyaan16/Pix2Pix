@@ -9,11 +9,11 @@ BATCH_SIZE = 16 #1096 images 16 batch size hence number of batches = 1096/16 = 6
 NUM_WORKERS = 2
 IMAGE_SIZE = 256
 CHANNELS_IMG = 3
-L1_LAMBDA = 100
+L1_LAMBDA = 300 #increased due to minor artifacts in old rate
 LAMBDA_GP = 10
 NUM_EPOCHS = 500
 LOAD_MODEL = False
-SAVE_MODEL = False
+SAVE_MODEL = True
 CHECKPOINT_DISC = "disc.pth.tar"
 CHECKPOINT_GEN = "gen.pth.tar"
 
