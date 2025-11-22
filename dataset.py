@@ -38,13 +38,13 @@ class MapDataset(Dataset):
         
         if should_flip:
             from torchvision.transforms import functional as TF
-            input_image = TF.hflip(input_image)
-            target_image = TF.hflip(target_image)
+            input_image = TF.hflip(img=input_image)
+            target_image = TF.hflip(img=target_image)
         
-        # Apply color jitter only to input
+        # Apply color jitter
         input_image = config.transform_only_input(input_image)
         
-        # Apply normalization to target (no augmentation)
+        # Apply normalization to target
         target_image = config.transform_only_mask(target_image)
 
         return input_image, target_image
