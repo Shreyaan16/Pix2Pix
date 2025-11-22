@@ -17,18 +17,16 @@ SAVE_MODEL = True
 CHECKPOINT_DISC = "disc.pth.tar"
 CHECKPOINT_GEN = "gen.pth.tar"
 
-# Transform for both input and target (resize)
 both_transform = transforms.Compose([
     transforms.Resize((256, 256)),
 ])
 
-# Transform for input image (with augmentation)
-# Note: HorizontalFlip is handled in dataset.py for synchronization
+# Transform for input 
 transform_only_input = transforms.Compose([
     transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.2),
     transforms.ToTensor(),
     transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]),
-])
+])# HorizontalFlip is handled in dataset.py
 
 # Transform for target image (no augmentation)
 transform_only_mask = transforms.Compose([
