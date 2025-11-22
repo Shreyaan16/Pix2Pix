@@ -1,6 +1,5 @@
 torch
-PIL
+pandas
 numpy
-os
 torchvision
 tqdm

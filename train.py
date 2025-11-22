@@ -15,38 +15,35 @@ from torch.amp.grad_scaler import GradScaler
 torch.backends.cudnn.benchmark = True
 
 
-def train_fn(
-    disc, gen, loader, opt_disc, opt_gen, l1_loss, bce, g_scaler, d_scaler,
-):
+def train_fn(disc, gen, loader, opt_disc, opt_gen, l1_loss, bce, g_scaler, d_scaler,):
     loop = tqdm(loader, leave=True)
 
-    #iterate over batches x -> input image , y -> target image
+    #iterate in bactches x is input , y is target
     for idx, (x, y) in enumerate(loop):
         x = x.to(config.DEVICE)
         y = y.to(config.DEVICE)
 
-        # Train Discriminator
+        #discrim train
         with autocast(device_type='cuda'):
-            y_fake = gen(x) # generator output
-            D_real = disc(x, y) #Discriminator confidence that real is real
+            y_fake = gen(x) 
+            D_real = disc(x, y) #disc confidence that real is real
             D_real_loss = bce(D_real, torch.ones_like(D_real))
-            #Discriminator confidence that fake is real
-            D_fake = disc(x, y_fake.detach()) #.detach() stops gradients from flowing into the generator when updating D.
+            #disc confidence that fake is real
+            D_fake = disc(x, y_fake.detach()) #stops gradients from flowing into the generator when updating D.
             D_fake_loss = bce(D_fake, torch.zeros_like(D_fake))
             D_loss = (D_real_loss + D_fake_loss) / 2
 
-        #Mixed-precision training is used with GradScaler for stability and speed on GPUs.
         disc.zero_grad()
         d_scaler.scale(D_loss).backward()
         d_scaler.step(opt_disc)
         d_scaler.update()
 
-        # Train generator
+        # gen train
         with autocast(device_type='cuda'):
             D_fake = disc(x, y_fake) 
             G_fake_loss = bce(D_fake, torch.ones_like(D_fake)) 
             L1 = l1_loss(y_fake, y) * config.L1_LAMBDA
-            #Total generator loss
+            
             G_loss = G_fake_loss + L1
 
         opt_gen.zero_grad()
@@ -59,8 +56,7 @@ def train_fn(
                 D_real=torch.sigmoid(D_real).mean().item(),
                 D_fake=torch.sigmoid(D_fake).mean().item(),
                 G_loss=G_loss.item(),
-                L1=L1.item(),
-            )
+                L1=L1.item())
 
 
 def main():
@@ -72,31 +68,22 @@ def main():
     L1_LOSS = nn.L1Loss()
 
     if config.LOAD_MODEL:
-        load_checkpoint(
-            config.CHECKPOINT_GEN, gen, opt_gen, config.LEARNING_RATE,
-        )
-        load_checkpoint(
-            config.CHECKPOINT_DISC, disc, opt_disc, config.LEARNING_RATE,
-        )
+        load_checkpoint(config.CHECKPOINT_GEN, gen, opt_gen, config.LEARNING_RATE,)
+
+        load_checkpoint(config.CHECKPOINT_DISC, disc, opt_disc, config.LEARNING_RATE,)
 
     train_dataset = MapDataset(root_dir=config.TRAIN_DIR)
-    train_loader = DataLoader(
-        train_dataset,
-        batch_size=config.BATCH_SIZE,
-        shuffle=True,
-        num_workers=config.NUM_WORKERS,
-    )
+    train_loader = DataLoader(train_dataset, batch_size=config.BATCH_SIZE, shuffle=True, num_workers=config.NUM_WORKERS)
     g_scaler = GradScaler(device='cuda')
     d_scaler = GradScaler(device='cuda')
     val_dataset = MapDataset(root_dir=config.VAL_DIR)
     val_loader = DataLoader(val_dataset, batch_size=1, shuffle=False)
 
     for epoch in range(config.NUM_EPOCHS):
-        #After 69 batches → 1 epoch complete → Save examples → Start next epoch
+        #After 69 batches -> 1 epoch complete -> Save examples -> Start next epoch
         print(f"\nEpoch [{epoch+1}/{config.NUM_EPOCHS}]")
-        train_fn(
-            disc, gen, train_loader, opt_disc, opt_gen, L1_LOSS, BCE, g_scaler, d_scaler,
-        )
+
+        train_fn(disc, gen, train_loader, opt_disc, opt_gen, L1_LOSS, BCE, g_scaler, d_scaler,)
 
         if config.SAVE_MODEL and epoch % 5 == 0:
             save_checkpoint(gen, opt_gen, filename=config.CHECKPOINT_GEN)

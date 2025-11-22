@@ -1,3 +1,7 @@
 data/
 .vscode
 __pycache__
+
+test_results.png
+train2.py
+evaluation
