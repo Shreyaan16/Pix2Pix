@@ -1,6 +1,9 @@
 data/
 .vscode
 __pycache__
+maps
+test_outputs
+training_plots
 
 test_results.png
 train2.py

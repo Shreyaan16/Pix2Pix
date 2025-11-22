@@ -1,4 +1,4 @@
-import numpy as np
+# Author: Shriansh Jain(S20230010225)
 import config
 import os
 from PIL import Image
@@ -20,21 +20,16 @@ class MapDataset(Dataset):
         img_path = os.path.join(self.root_dir, img_file)
         image = Image.open(img_path)
         
-        # Split the image into input and target
         w, h = image.size
         input_image = image.crop((0, 0, w//2, h))  # Left half
         target_image = image.crop((w//2, 0, w, h))  # Right half
 
-        # Apply resize to both
         input_image = config.both_transform(input_image)
         target_image = config.both_transform(target_image)
 
-        # Apply random seed for synchronized augmentation (horizontal flip)
         seed = torch.randint(0, 2**32, (1,)).item()
         torch.manual_seed(seed)
-        
-        # Check if we should flip (to keep both synchronized)
-        should_flip = torch.rand(1).item() < 0.5
+        should_flip = torch.rand(1).item() < 0.5 #randomflip
         
         if should_flip:
             from torchvision.transforms import functional as TF

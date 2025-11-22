@@ -1,3 +1,5 @@
+# Author: Shriansh Jain(S20230010225)
+
 import torch
 from utils import save_checkpoint, load_checkpoint, save_some_examples
 import torch.nn as nn

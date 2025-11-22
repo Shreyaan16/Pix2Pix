@@ -1,3 +1,4 @@
+# Common file, not really divided in authors
 import torch
 from torchvision import transforms
 

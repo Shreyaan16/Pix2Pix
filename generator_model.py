@@ -1,3 +1,5 @@
+#Author: Shreyaan Loke(S20230010224)
+
 import torch
 import torch.nn as nn
 

@@ -1,3 +1,5 @@
+# Authors: Shreyaan Loke(S20230010224), Shriansh Jain(S20230010225)
+
 import torch
 import config
 from torchvision.utils import save_image
